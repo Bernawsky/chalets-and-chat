@@ -236,7 +236,7 @@ export function ReservasApp() {
             <UnidadeCard
               key={unidade.id}
               unidade={unidade}
-              mostrarErros={mostrarErros}
+              mostrarErros={mostrarErros || unidadesInvalidas.length > 0}
               onHorario={handleHorario}
               onPessoas={handlePessoas}
               onItem={handleItem}
