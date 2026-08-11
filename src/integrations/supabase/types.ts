@@ -14,7 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      pedidos: {
+        Row: {
+          created_at: string
+          id: number
+          saudacao: string
+          titulo: string
+          total_itens: number
+          total_pessoas: number
+          total_unidades: number
+          unidades: Json
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          saudacao?: string
+          titulo?: string
+          total_itens?: number
+          total_pessoas?: number
+          total_unidades?: number
+          unidades?: Json
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          saudacao?: string
+          titulo?: string
+          total_itens?: number
+          total_pessoas?: number
+          total_unidades?: number
+          unidades?: Json
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
