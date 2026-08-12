@@ -26,7 +26,7 @@ export const Route = createFileRoute("/auth")({
 
 function AuthPage() {
   const navigate = useNavigate();
-  const search = useSearch({ from: "/auth" });
+  
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
   const [enviando, setEnviando] = useState(false);
@@ -42,8 +42,7 @@ function AuthPage() {
       return;
     }
     toast.success("Bem-vindo de volta!");
-    const destino = search.redirect && search.redirect.startsWith("/") ? search.redirect : "/metricas";
-    void navigate({ to: destino });
+    void navigate({ to: "/metricas" });
   };
 
   return (
