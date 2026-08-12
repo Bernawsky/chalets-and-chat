@@ -4,15 +4,13 @@ import { Link } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { UnidadeCard, type Unidade } from "@/components/unidade-card";
 import { Button } from "@/components/ui/button";
-import { LINK_GRUPO, descreverItens, type UnidadePedido } from "@/lib/pedidos";
+import {
+  LINK_GRUPO,
+  dataSaudacao,
+  gerarMensagem,
+  type UnidadePedido,
+} from "@/lib/pedidos";
 import { salvarPedido } from "@/lib/pedidos-api";
-
-function dataHoje() {
-  const d = new Date();
-  const dia = String(d.getDate()).padStart(2, "0");
-  const mes = String(d.getMonth() + 1).padStart(2, "0");
-  return `${dia}/${mes}`;
-}
 
 function criarUnidades(): Unidade[] {
   const chales = Array.from({ length: 10 }, (_, i) => ({
@@ -21,8 +19,13 @@ function criarUnidades(): Unidade[] {
     horario: "",
     pessoas: 0,
     itens: {} as Record<string, number>,
+    dietas: [] as string[],
+    observacao: "",
   }));
-  return [...chales, { id: 11, nome: "Suíte", isSuite: true, horario: "", pessoas: 0, itens: {} }];
+  return [
+    ...chales,
+    { id: 11, nome: "Suíte", isSuite: true, horario: "", pessoas: 0, itens: {}, dietas: [], observacao: "" },
+  ];
 }
 
 /**
@@ -30,10 +33,9 @@ function criarUnidades(): Unidade[] {
  * Usa a Clipboard API quando disponível e cai para execCommand("copy")
  * quando o navegador bloqueia ou não suporta a API.
  */
-function copiarTexto(texto: string): boolean {
+export function copiarTexto(texto: string): boolean {
   try {
     if (typeof navigator !== "undefined" && navigator.clipboard?.writeText) {
-      // dispara dentro do gesto; não aguardamos para não perder o contexto
       void navigator.clipboard.writeText(texto).catch(() => copiarFallback(texto));
       return true;
     }
@@ -43,7 +45,7 @@ function copiarTexto(texto: string): boolean {
   return copiarFallback(texto);
 }
 
-function copiarFallback(texto: string): boolean {
+export function copiarFallback(texto: string): boolean {
   try {
     const area = document.createElement("textarea");
     area.value = texto;
@@ -63,7 +65,7 @@ function copiarFallback(texto: string): boolean {
 }
 
 export function ReservasApp() {
-  const [saudacao, setSaudacao] = useState(`Olá cestas de café da manhã ${dataHoje()}`);
+  const [saudacao, setSaudacao] = useState(dataSaudacao());
   const [unidades, setUnidades] = useState<Unidade[]>(criarUnidades);
   const [enviando, setEnviando] = useState(false);
   const [copiado, setCopiado] = useState(false);
@@ -92,9 +94,29 @@ export function ReservasApp() {
     setCopiado(false);
   };
 
+  const handleDieta = (id: number, key: string, ativo: boolean) => {
+    setUnidades((prev) =>
+      prev.map((u) => {
+        if (u.id !== id) return u;
+        const dietas = ativo
+          ? Array.from(new Set([...(u.dietas ?? []), key]))
+          : (u.dietas ?? []).filter((d) => d !== key);
+        return { ...u, dietas };
+      }),
+    );
+    setCopiado(false);
+  };
+
+  const handleObservacao = (id: number, texto: string) => {
+    setUnidades((prev) => prev.map((u) => (u.id === id ? { ...u, observacao: texto } : u)));
+    setCopiado(false);
+  };
+
   const handleLimpar = (id: number) => {
     setUnidades((prev) =>
-      prev.map((u) => (u.id === id ? { ...u, horario: "", pessoas: 0, itens: {} } : u)),
+      prev.map((u) =>
+        u.id === id ? { ...u, horario: "", pessoas: 0, itens: {}, dietas: [], observacao: "" } : u,
+      ),
     );
   };
 
@@ -107,7 +129,12 @@ export function ReservasApp() {
   const unidadesAtivas = useMemo(
     () =>
       unidades.filter(
-        (u) => u.horario || u.pessoas > 0 || Object.values(u.itens).some((q) => q > 0),
+        (u) =>
+          u.horario ||
+          u.pessoas > 0 ||
+          Object.values(u.itens).some((q) => q > 0) ||
+          (u.dietas?.length ?? 0) > 0 ||
+          u.observacao?.trim(),
       ),
     [unidades],
   );
@@ -118,23 +145,20 @@ export function ReservasApp() {
     [unidadesAtivas],
   );
 
-  const mensagem = useMemo(() => {
-    const linhas: string[] = [];
-    if (saudacao.trim()) linhas.push(saudacao.trim());
+  const payload: UnidadePedido[] = useMemo(
+    () =>
+      unidadesAtivas.map((u) => ({
+        unidade: u.nome,
+        horario: u.horario,
+        pessoas: u.pessoas,
+        itens: u.itens,
+        dietas: u.dietas ?? [],
+        observacao: u.observacao?.trim() ?? "",
+      })),
+    [unidadesAtivas],
+  );
 
-    for (const u of unidadesAtivas) {
-      const partes: string[] = [u.nome];
-      if (u.horario) partes.push(`às ${u.horario}`);
-      const detalhes: string[] = [];
-      if (u.pessoas > 0) detalhes.push(`${u.pessoas} ${u.pessoas === 1 ? "pessoa" : "pessoas"}`);
-      detalhes.push(...descreverItens(u.itens));
-      let linha = partes.join(" ");
-      if (detalhes.length > 0) linha += ` — ${detalhes.join(", ")}`;
-      linhas.push(linha);
-    }
-
-    return linhas.join("\n");
-  }, [saudacao, unidadesAtivas]);
+  const mensagem = useMemo(() => gerarMensagem(saudacao, payload), [saudacao, payload]);
 
   const podeEnviar = unidadesAtivas.length > 0 && unidadesInvalidas.length === 0;
 
@@ -174,13 +198,6 @@ export function ReservasApp() {
     }
 
     // 2) Salva o pedido para o dashboard de métricas
-    const payload: UnidadePedido[] = unidadesAtivas.map((u) => ({
-      unidade: u.nome,
-      horario: u.horario,
-      pessoas: u.pessoas,
-      itens: u.itens,
-    }));
-
     void salvarPedido({ titulo: saudacao.trim(), saudacao: saudacao.trim(), unidades: payload })
       .catch(() => {
         toast.error("Não foi possível registrar o pedido nas métricas");
@@ -225,10 +242,21 @@ export function ReservasApp() {
                 setSaudacao(e.target.value);
                 setCopiado(false);
               }}
-              placeholder="Ex: Olá cestas de café da manhã 07/08"
+              placeholder="Ex: ☕Olá, café para segunda-feira 07/08/25"
               className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground/60 focus:border-ring focus:ring-2 focus:ring-ring/30"
             />
           </label>
+
+          {unidadesAtivas.length > 0 && (
+            <div className="mt-4">
+              <p className="mb-1.5 text-xs font-medium text-muted-foreground">
+                Prévia da mensagem do WhatsApp
+              </p>
+              <pre className="max-h-56 overflow-auto rounded-lg border border-border bg-background p-3 text-xs whitespace-pre-wrap text-foreground">
+                {mensagem}
+              </pre>
+            </div>
+          )}
         </section>
 
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -240,6 +268,8 @@ export function ReservasApp() {
               onHorario={handleHorario}
               onPessoas={handlePessoas}
               onItem={handleItem}
+              onDieta={handleDieta}
+              onObservacao={handleObservacao}
               onLimpar={handleLimpar}
             />
           ))}
