@@ -26,7 +26,7 @@ export async function getPedidos(): Promise<Pedido[]> {
   const { data, error } = await supabase
     .from("pedidos")
     .select(
-      "id, created_at, titulo, saudacao, unidades, total_unidades, total_itens, total_pessoas",
+      "id, created_at, titulo, saudacao, unidades, total_unidades, total_itens, total_pessoas, status, motivo_cancelamento, cancelado_at, updated_at",
     )
     .order("created_at", { ascending: false });
 

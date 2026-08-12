@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { MetricasDashboard } from "@/components/metricas-dashboard";
 
-export const Route = createFileRoute("/metricas")({
+export const Route = createFileRoute("/_authenticated/metricas")({
   head: () => ({
     meta: [
       { title: "Métricas de Pedidos — Cestas de Café da Manhã" },
