@@ -12,9 +12,13 @@ import {
   Flame,
   Egg,
   AlertCircle,
+  MessageSquare,
+  Sprout,
+  Wheat,
+  Milk,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { HORARIOS, ITENS, type Itens } from "@/lib/pedidos";
+import { HORARIOS, ITENS, DIETAS, EMOJI_HORARIO, type Itens } from "@/lib/pedidos";
 
 const ICONES: Record<string, typeof Coffee> = {
   cafe: Coffee,
@@ -24,6 +28,12 @@ const ICONES: Record<string, typeof Coffee> = {
   ovos: Egg,
 };
 
+const ICONES_DIETA: Record<string, typeof Coffee> = {
+  vegana: Sprout,
+  semGluten: Wheat,
+  semLactose: Milk,
+};
+
 export type Unidade = {
   id: number;
   nome: string;
@@ -31,6 +41,8 @@ export type Unidade = {
   horario: string;
   pessoas: number;
   itens: Itens;
+  dietas: string[];
+  observacao: string;
 };
 
 type UnidadeCardProps = {
@@ -39,6 +51,8 @@ type UnidadeCardProps = {
   onHorario: (id: number, horario: string) => void;
   onPessoas: (id: number, pessoas: number) => void;
   onItem: (id: number, key: string, qtd: number) => void;
+  onDieta: (id: number, key: string, ativo: boolean) => void;
+  onObservacao: (id: number, texto: string) => void;
   onLimpar: (id: number) => void;
 };
 
@@ -91,12 +105,16 @@ export function UnidadeCard({
   onHorario,
   onPessoas,
   onItem,
+  onDieta,
+  onObservacao,
   onLimpar,
 }: UnidadeCardProps) {
   const ativo =
     Boolean(unidade.horario) ||
     unidade.pessoas > 0 ||
-    Object.values(unidade.itens).some((q) => q > 0);
+    Object.values(unidade.itens).some((q) => q > 0) ||
+    (unidade.dietas?.length ?? 0) > 0 ||
+    Boolean(unidade.observacao?.trim());
 
   const erroHorario = ativo && !unidade.horario;
   const erroPessoas = ativo && !(unidade.pessoas > 0);
@@ -173,7 +191,7 @@ export function UnidadeCard({
                       : "border-input bg-background text-foreground hover:border-primary/50",
                 )}
               >
-                {h}
+                {EMOJI_HORARIO[h]} {h}
               </button>
             );
           })}
@@ -252,6 +270,55 @@ export function UnidadeCard({
           })}
         </div>
       </fieldset>
+
+      {/* Tipo de cesta (vegana / sem glúten / sem lactose) */}
+      <fieldset className="flex flex-col gap-1.5">
+        <legend className="text-xs font-medium text-muted-foreground">Tipo de cesta</legend>
+        <div className="flex flex-wrap gap-2">
+          {DIETAS.map((d) => {
+            const Icone = ICONES_DIETA[d.key];
+            const marcado = unidade.dietas?.includes(d.key) ?? false;
+            return (
+              <button
+                key={d.key}
+                type="button"
+                aria-pressed={marcado}
+                onClick={() => onDieta(unidade.id, d.key, !marcado)}
+                className={cn(
+                  "flex items-center gap-1.5 rounded-lg border px-3 py-2 text-xs font-medium transition-colors",
+                  marcado
+                    ? "border-primary bg-primary/10 text-foreground"
+                    : "border-input bg-background text-muted-foreground hover:border-primary/50",
+                )}
+              >
+                {Icone && (
+                  <Icone
+                    className={cn("size-3.5", marcado ? "text-primary" : "text-muted-foreground")}
+                    aria-hidden="true"
+                  />
+                )}
+                {d.emoji} {d.label}
+              </button>
+            );
+          })}
+        </div>
+      </fieldset>
+
+      {/* Observação livre */}
+      <label className="flex flex-col gap-1.5">
+        <span className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
+          <MessageSquare className="size-3.5" aria-hidden="true" />
+          Observação
+        </span>
+        <textarea
+          rows={2}
+          maxLength={280}
+          value={unidade.observacao ?? ""}
+          onChange={(e) => onObservacao(unidade.id, e.target.value)}
+          placeholder="Ex: sem açúcar, entregar na varanda..."
+          className="w-full resize-y rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground/60 focus:border-ring focus:ring-2 focus:ring-ring/30"
+        />
+      </label>
 
       {ativo &&
         (invalido ? (
