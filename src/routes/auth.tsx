@@ -1,16 +1,11 @@
 import { useState } from "react";
-import { createFileRoute, useNavigate, useSearch, Link } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { LogIn, Lock, Mail, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 
-type Busca = { redirect?: string };
-
 export const Route = createFileRoute("/auth")({
-  validateSearch: (search: Record<string, unknown>): Busca => ({
-    redirect: typeof search['redirect'] === "string" ? (search['redirect'] as string) : undefined,
-  }),
   head: () => ({
     meta: [
       { title: "Entrar — Painel de Pedidos Quitutes" },
