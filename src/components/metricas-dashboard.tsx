@@ -229,14 +229,38 @@ export function MetricasDashboard() {
             <Button
               variant="outline"
               className="gap-2"
-              disabled={filtrados.length === 0}
-              onClick={() =>
-                exportarPedidosPDF(filtrados, porUnidade, periodo, LABEL_PERIODO[periodo])
-              }
+              disabled={filtrados.length === 0 || enviando}
+              onClick={async () => {
+                const { nomeArquivo, base64 } = exportarPedidosPDF(
+                  filtrados,
+                  porUnidade,
+                  periodo,
+                  LABEL_PERIODO[periodo],
+                );
+                setEnviando(true);
+                try {
+                  await enviar({
+                    data: {
+                      arquivo: nomeArquivo,
+                      pdfBase64: base64,
+                      periodo,
+                      rotuloPeriodo: LABEL_PERIODO[periodo],
+                      totalPedidos: filtrados.length,
+                      ranking: porUnidade,
+                    },
+                  });
+                  toast.success("PDF gerado e enviado ao n8n");
+                } catch {
+                  toast.error("PDF gerado, mas o envio ao n8n falhou");
+                } finally {
+                  setEnviando(false);
+                }
+              }}
             >
               <FileText className="size-4" aria-hidden="true" />
               PDF
             </Button>
+
           </div>
         </div>
 
