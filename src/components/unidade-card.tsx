@@ -191,7 +191,7 @@ export function UnidadeCard({
                       : "border-input bg-background text-foreground hover:border-primary/50",
                 )}
               >
-                {EMOJI_HORARIO[h]} {h}
+                {h}
               </button>
             );
           })}
