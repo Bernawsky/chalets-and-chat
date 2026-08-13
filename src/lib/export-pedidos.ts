@@ -94,5 +94,9 @@ export function exportarPedidosPDF(
     headStyles: { fillColor: [161, 98, 7] },
   });
 
-  doc.save(`pedidos-${sufixo}.pdf`);
+  const nomeArquivo = `pedidos-${sufixo}.pdf`;
+  doc.save(nomeArquivo);
+  const dataUri = doc.output("datauristring");
+  return { nomeArquivo, base64: dataUri.slice(dataUri.indexOf(",") + 1) };
 }
+
