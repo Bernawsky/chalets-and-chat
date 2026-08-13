@@ -257,8 +257,11 @@ export function MetricasDashboard() {
                     },
                   });
                   toast.success("PDF gerado e enviado ao n8n");
-                } catch {
-                  toast.error("PDF gerado, mas o envio ao n8n falhou");
+                } catch (e) {
+                  toast.error(
+                    e instanceof Error ? e.message : "PDF gerado, mas o envio ao n8n falhou",
+                  );
+
                 } finally {
                   setEnviando(false);
                 }
