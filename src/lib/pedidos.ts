@@ -114,7 +114,7 @@ export function gerarMensagem(saudacao: string, unidades: UnidadePedido[]): stri
   });
 
   for (const h of ordem) {
-    linhas.push(`${EMOJI_HORARIO[h] ?? "🕐"} *${h}*`);
+    linhas.push(`*${h}*`);
     for (const u of grupos.get(h) ?? []) linhas.push(linhaUnidade(u));
   }
 

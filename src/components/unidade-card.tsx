@@ -18,7 +18,7 @@ import {
   Milk,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { HORARIOS, ITENS, DIETAS, EMOJI_HORARIO, type Itens } from "@/lib/pedidos";
+import { HORARIOS, ITENS, DIETAS, type Itens } from "@/lib/pedidos";
 
 const ICONES: Record<string, typeof Coffee> = {
   cafe: Coffee,
@@ -191,7 +191,7 @@ export function UnidadeCard({
                       : "border-input bg-background text-foreground hover:border-primary/50",
                 )}
               >
-                {EMOJI_HORARIO[h]} {h}
+                {h}
               </button>
             );
           })}
