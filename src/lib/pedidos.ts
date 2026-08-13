@@ -65,11 +65,14 @@ export type Pedido = {
   updated_at?: string;
 };
 
+// A cesta é uma encomenda: enviada hoje, mas sempre para o dia seguinte.
 export function dataSaudacao(d = new Date()): string {
-  const semana = d.toLocaleDateString("pt-BR", { weekday: "long" });
-  const dia = String(d.getDate()).padStart(2, "0");
-  const mes = String(d.getMonth() + 1).padStart(2, "0");
-  const ano = String(d.getFullYear()).slice(-2);
+  const amanha = new Date(d);
+  amanha.setDate(amanha.getDate() + 1);
+  const semana = amanha.toLocaleDateString("pt-BR", { weekday: "long" });
+  const dia = String(amanha.getDate()).padStart(2, "0");
+  const mes = String(amanha.getMonth() + 1).padStart(2, "0");
+  const ano = String(amanha.getFullYear()).slice(-2);
   return `☕Olá, café para (${semana}) ${dia}/${mes}/${ano}`;
 }
 
