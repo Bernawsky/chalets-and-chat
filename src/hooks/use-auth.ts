@@ -30,7 +30,11 @@ export function useAuth() {
     }
     let ativo = true;
     void supabase
-      .rpc("has_role", { _user_id: user.id, _role: "admin" })
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", user.id)
+      .eq("role", "admin")
+      .maybeSingle()
       .then(({ data }) => {
         if (ativo) setIsAdmin(Boolean(data));
       });
