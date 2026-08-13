@@ -30,6 +30,10 @@ import { EditarPedidoDialog } from "@/components/editar-pedido-dialog";
 import { CancelarPedidoDialog } from "@/components/cancelar-pedido-dialog";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
+import { useServerFn } from "@tanstack/react-start";
+import { toast } from "sonner";
+import { enviarRelatorioN8n } from "@/lib/n8n.functions";
+
 
 type Periodo = "dia" | "semana" | "mes" | "ano";
 
@@ -117,6 +121,9 @@ export function MetricasDashboard() {
   const [periodo, setPeriodo] = useState<Periodo>("semana");
   const [editando, setEditando] = useState<Pedido | null>(null);
   const [cancelando, setCancelando] = useState<Pedido | null>(null);
+  const [enviando, setEnviando] = useState(false);
+  const enviar = useServerFn(enviarRelatorioN8n);
+
 
   const filtrados = useMemo(
     () => pedidos.filter((p) => dentroDoPeriodo(p.created_at, periodo)),
@@ -229,14 +236,38 @@ export function MetricasDashboard() {
             <Button
               variant="outline"
               className="gap-2"
-              disabled={filtrados.length === 0}
-              onClick={() =>
-                exportarPedidosPDF(filtrados, porUnidade, periodo, LABEL_PERIODO[periodo])
-              }
+              disabled={filtrados.length === 0 || enviando}
+              onClick={async () => {
+                const { nomeArquivo, base64 } = exportarPedidosPDF(
+                  filtrados,
+                  porUnidade,
+                  periodo,
+                  LABEL_PERIODO[periodo],
+                );
+                setEnviando(true);
+                try {
+                  await enviar({
+                    data: {
+                      arquivo: nomeArquivo,
+                      pdfBase64: base64,
+                      periodo,
+                      rotuloPeriodo: LABEL_PERIODO[periodo],
+                      totalPedidos: filtrados.length,
+                      ranking: porUnidade,
+                    },
+                  });
+                  toast.success("PDF gerado e enviado ao n8n");
+                } catch {
+                  toast.error("PDF gerado, mas o envio ao n8n falhou");
+                } finally {
+                  setEnviando(false);
+                }
+              }}
             >
               <FileText className="size-4" aria-hidden="true" />
               PDF
             </Button>
+
           </div>
         </div>
 
