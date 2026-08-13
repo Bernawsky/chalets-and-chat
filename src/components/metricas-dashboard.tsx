@@ -30,6 +30,10 @@ import { EditarPedidoDialog } from "@/components/editar-pedido-dialog";
 import { CancelarPedidoDialog } from "@/components/cancelar-pedido-dialog";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
+import { useServerFn } from "@tanstack/react-start";
+import { toast } from "sonner";
+import { enviarRelatorioN8n } from "@/lib/n8n.functions";
+
 
 type Periodo = "dia" | "semana" | "mes" | "ano";
 
