@@ -183,7 +183,7 @@ export function UnidadeCard({
                 aria-checked={selecionado}
                 onClick={() => onHorario(unidade.id, selecionado ? "" : h)}
                 className={cn(
-                  "rounded-lg border px-3 py-2 text-sm font-medium transition-colors",
+                  "rounded-lg border px-3 py-2 text-sm font-bold transition-colors",
                   selecionado
                     ? "border-primary bg-primary text-primary-foreground"
                     : mostrarErros && erroHorario
@@ -297,7 +297,7 @@ export function UnidadeCard({
                     aria-hidden="true"
                   />
                 )}
-                {d.emoji} {d.label}
+                {d.label}
               </button>
             );
           })}

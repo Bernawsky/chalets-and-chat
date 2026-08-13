@@ -1,11 +1,6 @@
 export const HORARIOS = ["6:30", "8:00"] as const;
 export type Horario = (typeof HORARIOS)[number];
 
-export const EMOJI_HORARIO: Record<string, string> = {
-  "6:30": "🕕",
-  "8:00": "🕗",
-};
-
 export const ITENS = [
   { key: "cafe", label: "Garrafinha de café" },
   { key: "suco", label: "Garrafinha de suco" },
@@ -18,9 +13,9 @@ export type Itens = Record<string, number>;
 
 // Opções de cesta especial (aparecem em negrito na mensagem do WhatsApp)
 export const DIETAS = [
-  { key: "vegana", label: "Cesta vegana", emoji: "🌱" },
-  { key: "semGluten", label: "Cesta sem glúten", emoji: "🌾" },
-  { key: "semLactose", label: "Cesta sem lactose", emoji: "🥛" },
+  { key: "vegana", label: "Cesta vegana" },
+  { key: "semGluten", label: "Cesta sem glúten" },
+  { key: "semLactose", label: "Cesta sem lactose" },
 ] as const;
 export type DietaKey = (typeof DIETAS)[number]["key"];
 
