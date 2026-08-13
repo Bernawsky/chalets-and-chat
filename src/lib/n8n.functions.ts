@@ -35,15 +35,18 @@ export const enviarRelatorioN8n = createServerFn({ method: "POST" })
         headers: { "content-type": "application/json" },
         body,
       });
-      if (res.ok) return { ok: true as const, url };
+      if (res.ok) return { ok: true as const, erro: null };
       ultimoStatus = res.status;
       if (res.status !== 404) break;
     }
 
-    throw new Error(
-      ultimoStatus === 404
-        ? "Webhook do n8n não registrado (404). Ative o workflow no n8n para a URL de produção funcionar."
-        : `Falha no envio ao n8n (${ultimoStatus})`,
-    );
+    return {
+      ok: false as const,
+      erro:
+        ultimoStatus === 404
+          ? "Webhook do n8n não registrado. Ative o workflow no n8n para a URL de produção funcionar."
+          : `Falha no envio ao n8n (${ultimoStatus})`,
+    };
   });
+
 

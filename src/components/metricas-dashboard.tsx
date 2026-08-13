@@ -246,7 +246,7 @@ export function MetricasDashboard() {
                 );
                 setEnviando(true);
                 try {
-                  await enviar({
+                  const r = await enviar({
                     data: {
                       arquivo: nomeArquivo,
                       pdfBase64: base64,
@@ -256,11 +256,13 @@ export function MetricasDashboard() {
                       ranking: porUnidade,
                     },
                   });
-                  toast.success("PDF gerado e enviado ao n8n");
+                  if (r.ok) toast.success("PDF gerado e enviado ao n8n");
+                  else toast.warning(`PDF gerado. ${r.erro}`);
                 } catch (e) {
                   toast.error(
                     e instanceof Error ? e.message : "PDF gerado, mas o envio ao n8n falhou",
                   );
+
 
                 } finally {
                   setEnviando(false);
