@@ -60,6 +60,7 @@ export function exportarPedidosPDF(
   ranking: Ranking[],
   sufixo: string,
   rotuloPeriodo: string,
+  baixarArquivo = true,
 ) {
   const doc = new jsPDF({ orientation: "landscape" });
   doc.setFontSize(16);
