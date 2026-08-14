@@ -66,15 +66,16 @@ export function ExportarDialog({
         if (r.ok) {
           toast.success("Relatório enviado ao n8n");
         } else {
-          try {
-            await enviarRelatorioN8nDireto({
-              origem: "lovable-quitutes",
-              geradoEm: new Date().toISOString(),
-              ...payload,
-            });
+          // Fallback: envio direto pelo navegador (lida com rede/CORS internamente).
+          const direto = await enviarRelatorioN8nDireto({
+            origem: "lovable-quitutes",
+            geradoEm: new Date().toISOString(),
+            ...payload,
+          });
+          if (direto.ok) {
             toast.success("Relatório enviado ao n8n");
-          } catch {
-            toast.warning(r.erro ?? "Falha no envio ao n8n");
+          } else {
+            toast.warning(direto.erro ?? r.erro ?? "Falha no envio ao n8n");
           }
         }
       }
