@@ -60,6 +60,7 @@ export function exportarPedidosPDF(
   ranking: Ranking[],
   sufixo: string,
   rotuloPeriodo: string,
+  baixarArquivo = true,
 ) {
   const doc = new jsPDF({ orientation: "landscape" });
   doc.setFontSize(16);
@@ -95,7 +96,7 @@ export function exportarPedidosPDF(
   });
 
   const nomeArquivo = `pedidos-${sufixo}.pdf`;
-  doc.save(nomeArquivo);
+  if (baixarArquivo) doc.save(nomeArquivo);
   const dataUri = doc.output("datauristring");
   return { nomeArquivo, base64: dataUri.slice(dataUri.indexOf(",") + 1) };
 }

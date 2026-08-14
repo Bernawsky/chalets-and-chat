@@ -9,7 +9,6 @@ import {
   Home,
   TrendingUp,
   FileDown,
-  FileText,
   Pencil,
   Ban,
   LogOut,
@@ -25,14 +24,11 @@ import {
 import { Button } from "@/components/ui/button";
 import { getPedidos } from "@/lib/pedidos-api";
 import { normalizarHorario, observacoesUnidade, type Pedido } from "@/lib/pedidos";
-import { exportarPedidosCSV, exportarPedidosPDF } from "@/lib/export-pedidos";
 import { EditarPedidoDialog } from "@/components/editar-pedido-dialog";
 import { CancelarPedidoDialog } from "@/components/cancelar-pedido-dialog";
+import { ExportarDialog } from "@/components/exportar-dialog";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
-import { useServerFn } from "@tanstack/react-start";
-import { toast } from "sonner";
-import { enviarRelatorioN8n } from "@/lib/n8n.functions";
 
 
 type Periodo = "dia" | "semana" | "mes" | "ano";
@@ -121,8 +117,7 @@ export function MetricasDashboard() {
   const [periodo, setPeriodo] = useState<Periodo>("semana");
   const [editando, setEditando] = useState<Pedido | null>(null);
   const [cancelando, setCancelando] = useState<Pedido | null>(null);
-  const [enviando, setEnviando] = useState(false);
-  const enviar = useServerFn(enviarRelatorioN8n);
+  const [exportando, setExportando] = useState(false);
 
 
   const filtrados = useMemo(
@@ -228,51 +223,11 @@ export function MetricasDashboard() {
               variant="outline"
               className="gap-2"
               disabled={filtrados.length === 0}
-              onClick={() => exportarPedidosCSV(filtrados, porUnidade, periodo)}
+              onClick={() => setExportando(true)}
             >
               <FileDown className="size-4" aria-hidden="true" />
-              CSV
+              Exportar
             </Button>
-            <Button
-              variant="outline"
-              className="gap-2"
-              disabled={filtrados.length === 0 || enviando}
-              onClick={async () => {
-                const { nomeArquivo, base64 } = exportarPedidosPDF(
-                  filtrados,
-                  porUnidade,
-                  periodo,
-                  LABEL_PERIODO[periodo],
-                );
-                setEnviando(true);
-                try {
-                  const r = await enviar({
-                    data: {
-                      arquivo: nomeArquivo,
-                      pdfBase64: base64,
-                      periodo,
-                      rotuloPeriodo: LABEL_PERIODO[periodo],
-                      totalPedidos: filtrados.length,
-                      ranking: porUnidade,
-                    },
-                  });
-                  if (r.ok) toast.success("PDF gerado e enviado ao n8n");
-                  else toast.warning(`PDF gerado. ${r.erro}`);
-                } catch (e) {
-                  toast.error(
-                    e instanceof Error ? e.message : "PDF gerado, mas o envio ao n8n falhou",
-                  );
-
-
-                } finally {
-                  setEnviando(false);
-                }
-              }}
-            >
-              <FileText className="size-4" aria-hidden="true" />
-              PDF
-            </Button>
-
           </div>
         </div>
 
@@ -428,6 +383,14 @@ export function MetricasDashboard() {
       {cancelando && (
         <CancelarPedidoDialog pedido={cancelando} onClose={() => setCancelando(null)} />
       )}
+      <ExportarDialog
+        aberto={exportando}
+        onClose={() => setExportando(false)}
+        pedidos={filtrados}
+        ranking={porUnidade}
+        periodo={periodo}
+        rotuloPeriodo={LABEL_PERIODO[periodo]}
+      />
     </div>
   );
 }
