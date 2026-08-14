@@ -9,7 +9,6 @@ import {
   Home,
   TrendingUp,
   FileDown,
-  FileText,
   Pencil,
   Ban,
   LogOut,
