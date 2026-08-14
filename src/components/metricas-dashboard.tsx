@@ -121,8 +121,7 @@ export function MetricasDashboard() {
   const [periodo, setPeriodo] = useState<Periodo>("semana");
   const [editando, setEditando] = useState<Pedido | null>(null);
   const [cancelando, setCancelando] = useState<Pedido | null>(null);
-  const [enviando, setEnviando] = useState(false);
-  const enviar = useServerFn(enviarRelatorioN8n);
+  const [exportando, setExportando] = useState(false);
 
 
   const filtrados = useMemo(
