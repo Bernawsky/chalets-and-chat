@@ -96,7 +96,7 @@ export function exportarPedidosPDF(
   });
 
   const nomeArquivo = `pedidos-${sufixo}.pdf`;
-  doc.save(nomeArquivo);
+  if (baixarArquivo) doc.save(nomeArquivo);
   const dataUri = doc.output("datauristring");
   return { nomeArquivo, base64: dataUri.slice(dataUri.indexOf(",") + 1) };
 }
