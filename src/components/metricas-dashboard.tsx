@@ -392,6 +392,5 @@ export function MetricasDashboard() {
         rotuloPeriodo={LABEL_PERIODO[periodo]}
       />
     </div>
-    </div>
   );
 }
