@@ -228,51 +228,11 @@ export function MetricasDashboard() {
               variant="outline"
               className="gap-2"
               disabled={filtrados.length === 0}
-              onClick={() => exportarPedidosCSV(filtrados, porUnidade, periodo)}
+              onClick={() => setExportando(true)}
             >
               <FileDown className="size-4" aria-hidden="true" />
-              CSV
+              Exportar
             </Button>
-            <Button
-              variant="outline"
-              className="gap-2"
-              disabled={filtrados.length === 0 || enviando}
-              onClick={async () => {
-                const { nomeArquivo, base64 } = exportarPedidosPDF(
-                  filtrados,
-                  porUnidade,
-                  periodo,
-                  LABEL_PERIODO[periodo],
-                );
-                setEnviando(true);
-                try {
-                  const r = await enviar({
-                    data: {
-                      arquivo: nomeArquivo,
-                      pdfBase64: base64,
-                      periodo,
-                      rotuloPeriodo: LABEL_PERIODO[periodo],
-                      totalPedidos: filtrados.length,
-                      ranking: porUnidade,
-                    },
-                  });
-                  if (r.ok) toast.success("PDF gerado e enviado ao n8n");
-                  else toast.warning(`PDF gerado. ${r.erro}`);
-                } catch (e) {
-                  toast.error(
-                    e instanceof Error ? e.message : "PDF gerado, mas o envio ao n8n falhou",
-                  );
-
-
-                } finally {
-                  setEnviando(false);
-                }
-              }}
-            >
-              <FileText className="size-4" aria-hidden="true" />
-              PDF
-            </Button>
-
           </div>
         </div>
 
