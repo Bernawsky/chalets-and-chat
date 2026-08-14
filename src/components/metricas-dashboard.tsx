@@ -383,6 +383,15 @@ export function MetricasDashboard() {
       {cancelando && (
         <CancelarPedidoDialog pedido={cancelando} onClose={() => setCancelando(null)} />
       )}
+      <ExportarDialog
+        aberto={exportando}
+        onClose={() => setExportando(false)}
+        pedidos={filtrados}
+        ranking={porUnidade}
+        periodo={periodo}
+        rotuloPeriodo={LABEL_PERIODO[periodo]}
+      />
+    </div>
     </div>
   );
 }
