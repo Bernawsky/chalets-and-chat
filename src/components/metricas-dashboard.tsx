@@ -24,14 +24,11 @@ import {
 import { Button } from "@/components/ui/button";
 import { getPedidos } from "@/lib/pedidos-api";
 import { normalizarHorario, observacoesUnidade, type Pedido } from "@/lib/pedidos";
-import { exportarPedidosCSV, exportarPedidosPDF } from "@/lib/export-pedidos";
 import { EditarPedidoDialog } from "@/components/editar-pedido-dialog";
 import { CancelarPedidoDialog } from "@/components/cancelar-pedido-dialog";
+import { ExportarDialog } from "@/components/exportar-dialog";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
-import { useServerFn } from "@tanstack/react-start";
-import { toast } from "sonner";
-import { enviarRelatorioN8n } from "@/lib/n8n.functions";
 
 
 type Periodo = "dia" | "semana" | "mes" | "ano";
