@@ -21,6 +21,7 @@ export type Database = {
           created_at: string
           id: number
           motivo_cancelamento: string | null
+          pousada: string
           saudacao: string
           status: string
           titulo: string
@@ -36,6 +37,7 @@ export type Database = {
           created_at?: string
           id?: number
           motivo_cancelamento?: string | null
+          pousada?: string
           saudacao?: string
           status?: string
           titulo?: string
@@ -51,6 +53,7 @@ export type Database = {
           created_at?: string
           id?: number
           motivo_cancelamento?: string | null
+          pousada?: string
           saudacao?: string
           status?: string
           titulo?: string
