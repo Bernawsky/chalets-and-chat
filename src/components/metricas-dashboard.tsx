@@ -28,6 +28,7 @@ import { EditarPedidoDialog } from "@/components/editar-pedido-dialog";
 import { CancelarPedidoDialog } from "@/components/cancelar-pedido-dialog";
 import { ExportarDialog } from "@/components/exportar-dialog";
 import { useAuth } from "@/hooks/use-auth";
+import { POUSADAS } from "@/lib/pousadas";
 import { supabase } from "@/integrations/supabase/client";
 
 
@@ -115,14 +116,20 @@ export function MetricasDashboard() {
     queryFn: getPedidos,
   });
   const [periodo, setPeriodo] = useState<Periodo>("semana");
+  const [pousadaFiltro, setPousadaFiltro] = useState<string>("todas");
   const [editando, setEditando] = useState<Pedido | null>(null);
   const [cancelando, setCancelando] = useState<Pedido | null>(null);
   const [exportando, setExportando] = useState(false);
 
 
   const filtrados = useMemo(
-    () => pedidos.filter((p) => dentroDoPeriodo(p.created_at, periodo)),
-    [pedidos, periodo],
+    () =>
+      pedidos.filter(
+        (p) =>
+          dentroDoPeriodo(p.created_at, periodo) &&
+          (pousadaFiltro === "todas" || (p.pousada ?? "Vale do Sol") === pousadaFiltro),
+      ),
+    [pedidos, periodo, pousadaFiltro],
   );
 
   const ativos = useMemo(() => filtrados.filter((p) => p.status !== "cancelado"), [filtrados]);
@@ -165,6 +172,20 @@ export function MetricasDashboard() {
   }, [ativos]);
 
   const maxUnidade = porUnidade[0]?.total ?? 0;
+
+  const porPousada = useMemo(() => {
+    const mapa = new Map<string, { pedidos: number; pessoas: number }>();
+    for (const p of ativos) {
+      const nome = p.pousada ?? "Vale do Sol";
+      const atual = mapa.get(nome) ?? { pedidos: 0, pessoas: 0 };
+      atual.pedidos += 1;
+      atual.pessoas += p.total_pessoas ?? 0;
+      mapa.set(nome, atual);
+    }
+    return Array.from(mapa.entries())
+      .map(([nome, v]) => ({ nome, ...v }))
+      .sort((a, b) => b.pedidos - a.pedidos);
+  }, [ativos]);
 
   const sair = async () => {
     await supabase.auth.signOut();
@@ -218,6 +239,25 @@ export function MetricasDashboard() {
               </button>
             ))}
           </div>
+          <div className="inline-flex flex-wrap rounded-xl border border-border bg-card p-1">
+            {[{ id: "todas", label: "Todas as pousadas" }, ...POUSADAS.map((p) => ({ id: p.nome, label: p.nome }))].map(
+              (opt) => (
+                <button
+                  key={opt.id}
+                  type="button"
+                  onClick={() => setPousadaFiltro(opt.id)}
+                  className={
+                    "rounded-lg px-3 py-2 text-sm font-medium transition-colors " +
+                    (pousadaFiltro === opt.id
+                      ? "bg-primary text-primary-foreground"
+                      : "text-muted-foreground hover:text-foreground")
+                  }
+                >
+                  {opt.label}
+                </button>
+              ),
+            )}
+          </div>
           <div className="ml-auto flex gap-2">
             <Button
               variant="outline"
@@ -259,6 +299,27 @@ export function MetricasDashboard() {
               </div>
             ) : (
               <>
+                {porPousada.length > 0 && (
+                  <section className="mb-6 rounded-2xl border border-border bg-card p-5">
+                    <h2 className="mb-4 font-heading text-base font-semibold text-card-foreground">
+                      Resumo por pousada
+                    </h2>
+                    <ul className="grid gap-3 sm:grid-cols-2">
+                      {porPousada.map((item) => (
+                        <li
+                          key={item.nome}
+                          className="flex items-center justify-between rounded-xl border border-border px-4 py-3"
+                        >
+                          <span className="text-sm font-medium text-card-foreground">{item.nome}</span>
+                          <span className="text-xs text-muted-foreground tabular-nums">
+                            {item.pedidos} pedido(s) • {item.pessoas} pessoa(s)
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  </section>
+                )}
+
                 <div className="grid gap-6 lg:grid-cols-2">
                   {/* Gráfico de volume */}
                   <section className="rounded-2xl border border-border bg-card p-5">
@@ -322,7 +383,7 @@ export function MetricasDashboard() {
                           <div className="flex flex-wrap items-start justify-between gap-3">
                             <div>
                               <p className="text-sm font-semibold text-card-foreground">
-                                #{p.id} — {p.saudacao || p.titulo}
+                                #{p.id} · {p.pousada ?? "Vale do Sol"} — {p.saudacao || p.titulo}
                               </p>
                               <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
                                 <Clock className="size-3.5" aria-hidden="true" />
