@@ -1,25 +1,27 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { ReservasApp } from "@/components/reservas-app";
+import { PedidosPortal } from "@/components/pedidos-portal";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Sistema de Pedidos — Cestas de Café da Manhã" },
+      { title: "Pedidos de Café da Manhã — Pousadas Quitutes" },
       {
         name: "description",
         content:
-          "Monte os pedidos de café da manhã dos chalés e da suíte e envie rapidamente no grupo do WhatsApp.",
+          "Entre com o usuário da pousada, monte os pedidos das cestas de café da manhã e envie rapidamente no grupo do WhatsApp.",
       },
-      { property: "og:title", content: "Sistema de Pedidos — Cestas de Café da Manhã" },
+      { property: "og:title", content: "Pedidos de Café da Manhã — Pousadas Quitutes" },
       {
         property: "og:description",
-        content: "Monte os pedidos dos chalés e envie rapidamente no grupo do WhatsApp.",
+        content: "Login por pousada para montar e enviar os pedidos das cestas de café da manhã.",
       },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: Index,
 });
 
 function Index() {
-  return <ReservasApp />;
+  return <PedidosPortal />;
 }
