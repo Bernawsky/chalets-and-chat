@@ -1,6 +1,5 @@
 import { useMemo, useState } from "react";
-import { ShoppingBasket, Send, MessageCircle, BarChart3, Copy, Check, AlertCircle } from "lucide-react";
-import { Link } from "@tanstack/react-router";
+import { ShoppingBasket, Send, MessageCircle, Copy, Check, AlertCircle, LogOut } from "lucide-react";
 import { toast } from "sonner";
 import { UnidadeCard, type Unidade } from "@/components/unidade-card";
 import { Button } from "@/components/ui/button";
@@ -11,21 +10,19 @@ import {
   type UnidadePedido,
 } from "@/lib/pedidos";
 import { salvarPedido } from "@/lib/pedidos-api";
+import type { Pousada } from "@/lib/pousadas";
 
-function criarUnidades(): Unidade[] {
-  const chales = Array.from({ length: 10 }, (_, i) => ({
+function criarUnidades(pousada: Pousada): Unidade[] {
+  return pousada.unidades.map((u, i) => ({
     id: i + 1,
-    nome: `Chalé ${i + 1}`,
+    nome: u.nome,
+    ...(u.isSuite ? { isSuite: true } : {}),
     horario: "",
     pessoas: 0,
     itens: {} as Record<string, number>,
     dietas: [] as string[],
     observacao: "",
   }));
-  return [
-    ...chales,
-    { id: 11, nome: "Suíte", isSuite: true, horario: "", pessoas: 0, itens: {}, dietas: [], observacao: "" },
-  ];
 }
 
 /**
@@ -64,9 +61,9 @@ export function copiarFallback(texto: string): boolean {
   }
 }
 
-export function ReservasApp() {
+export function ReservasApp({ pousada, onSair }: { pousada: Pousada; onSair?: () => void }) {
   const [saudacao, setSaudacao] = useState(dataSaudacao());
-  const [unidades, setUnidades] = useState<Unidade[]>(criarUnidades);
+  const [unidades, setUnidades] = useState<Unidade[]>(() => criarUnidades(pousada));
   const [enviando, setEnviando] = useState(false);
   const [copiado, setCopiado] = useState(false);
   const [mostrarErros, setMostrarErros] = useState(false);
@@ -121,7 +118,7 @@ export function ReservasApp() {
   };
 
   const handleLimparTudo = () => {
-    setUnidades(criarUnidades());
+    setUnidades(criarUnidades(pousada));
     setCopiado(false);
     setMostrarErros(false);
   };
@@ -198,7 +195,12 @@ export function ReservasApp() {
     }
 
     // 2) Salva o pedido para o dashboard de métricas
-    void salvarPedido({ titulo: saudacao.trim(), saudacao: saudacao.trim(), unidades: payload })
+    void salvarPedido({
+      titulo: saudacao.trim(),
+      saudacao: saudacao.trim(),
+      unidades: payload,
+      pousada: pousada.nome,
+    })
       .catch(() => {
         toast.error("Não foi possível registrar o pedido nas métricas");
       })
@@ -220,14 +222,18 @@ export function ReservasApp() {
           <span className="flex size-11 items-center justify-center rounded-xl bg-primary text-primary-foreground">
             <ShoppingBasket className="size-5" aria-hidden="true" />
           </span>
-          <div>
+          <div className="mr-auto">
             <h1 className="font-heading text-xl font-bold text-balance text-card-foreground">
-              Sistema de Pedidos
+              {pousada.nome}
             </h1>
-            <p className="text-sm text-muted-foreground">
-              Monte os pedidos e envie no grupo do WhatsApp
-            </p>
+            <p className="text-sm text-muted-foreground">{pousada.subtitulo}</p>
           </div>
+          {onSair && (
+            <Button variant="ghost" onClick={onSair} className="gap-2">
+              <LogOut className="size-4" aria-hidden="true" />
+              Sair
+            </Button>
+          )}
         </div>
       </header>
 
@@ -276,15 +282,6 @@ export function ReservasApp() {
         </div>
       </main>
 
-      {/* Botão flutuante para o dashboard de métricas */}
-      <Link
-        to="/metricas"
-        className="fixed right-4 bottom-24 z-10 flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2.5 text-sm font-medium text-card-foreground shadow-lg transition-colors hover:bg-secondary sm:bottom-28"
-        aria-label="Abrir dashboard de métricas"
-      >
-        <BarChart3 className="size-4 text-primary" aria-hidden="true" />
-        Métricas
-      </Link>
 
       <footer className="fixed inset-x-0 bottom-0 border-t border-border bg-card/95 backdrop-blur">
         <div className="mx-auto flex max-w-5xl flex-col gap-3 px-4 py-4 sm:flex-row sm:items-center sm:justify-between">

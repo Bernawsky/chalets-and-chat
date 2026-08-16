@@ -53,6 +53,7 @@ export type UnidadePedido = {
 export type Pedido = {
   id: number;
   created_at: string;
+  pousada?: string;
   titulo: string;
   saudacao: string;
   unidades: UnidadePedido[];

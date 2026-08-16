@@ -5,6 +5,7 @@ export async function salvarPedido(input: {
   titulo: string;
   saudacao: string;
   unidades: UnidadePedido[];
+  pousada: string;
 }) {
   const totalUnidades = input.unidades.length;
   const totalItens = input.unidades.reduce((acc, u) => acc + contarItens(u.itens), 0);
@@ -12,6 +13,7 @@ export async function salvarPedido(input: {
 
   const { error } = await supabase.from("pedidos").insert({
     titulo: input.titulo,
+    pousada: input.pousada,
     saudacao: input.saudacao,
     unidades: input.unidades as unknown as never,
     total_unidades: totalUnidades,
@@ -26,7 +28,7 @@ export async function getPedidos(): Promise<Pedido[]> {
   const { data, error } = await supabase
     .from("pedidos")
     .select(
-      "id, created_at, titulo, saudacao, unidades, total_unidades, total_itens, total_pessoas, status, motivo_cancelamento, cancelado_at, updated_at",
+      "id, created_at, pousada, titulo, saudacao, unidades, total_unidades, total_itens, total_pessoas, status, motivo_cancelamento, cancelado_at, updated_at",
     )
     .order("created_at", { ascending: false });
 

@@ -28,7 +28,9 @@ export function exportarPedidosCSV(pedidos: Pedido[], ranking: Ranking[], sufixo
   const linhas: string[] = [];
   linhas.push("PEDIDOS");
   linhas.push(
-    ["ID", "Data", "Situação", "Unidade", "Horário", "Pessoas", "Observações"].map(csvCampo).join(";"),
+    ["ID", "Data", "Pousada", "Situação", "Unidade", "Horário", "Pessoas", "Observações"]
+      .map(csvCampo)
+      .join(";"),
   );
   for (const p of pedidos) {
     for (const u of p.unidades ?? []) {
@@ -36,6 +38,7 @@ export function exportarPedidosCSV(pedidos: Pedido[], ranking: Ranking[], sufixo
         [
           p.id,
           dataBR(p.created_at),
+          p.pousada ?? "Vale do Sol",
           p.status === "cancelado" ? "Cancelado" : "Ativo",
           u.unidade,
           normalizarHorario(u.horario),
@@ -70,11 +73,12 @@ export function exportarPedidosPDF(
 
   autoTable(doc, {
     startY: 30,
-    head: [["ID", "Data", "Situação", "Unidade", "Horário", "Pessoas", "Observações"]],
+    head: [["ID", "Data", "Pousada", "Situação", "Unidade", "Horário", "Pessoas", "Observações"]],
     body: pedidos.flatMap((p) =>
       (p.unidades ?? []).map((u) => [
         String(p.id),
         dataBR(p.created_at),
+        p.pousada ?? "Vale do Sol",
         p.status === "cancelado" ? "Cancelado" : "Ativo",
         u.unidade,
         normalizarHorario(u.horario),

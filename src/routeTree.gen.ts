@@ -11,7 +11,9 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as AlquimiaChalesRouteImport } from './routes/alquimia-chales'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as ValeDoSolRouteImport } from './routes/vale-do-sol'
 import { Route as AuthenticatedMetricasRouteImport } from './routes/_authenticated/metricas'
 
 const IndexRoute = IndexRouteImport.update({
@@ -23,9 +25,19 @@ const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
   id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AlquimiaChalesRoute = AlquimiaChalesRouteImport.update({
+  id: '/alquimia-chales',
+  path: '/alquimia-chales',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ValeDoSolRoute = ValeDoSolRouteImport.update({
+  id: '/vale-do-sol',
+  path: '/vale-do-sol',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedMetricasRoute = AuthenticatedMetricasRouteImport.update({
@@ -36,34 +48,48 @@ const AuthenticatedMetricasRoute = AuthenticatedMetricasRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/alquimia-chales': typeof AlquimiaChalesRoute
   '/auth': typeof AuthRoute
+  '/vale-do-sol': typeof ValeDoSolRoute
   '/metricas': typeof AuthenticatedMetricasRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/alquimia-chales': typeof AlquimiaChalesRoute
   '/auth': typeof AuthRoute
+  '/vale-do-sol': typeof ValeDoSolRoute
   '/metricas': typeof AuthenticatedMetricasRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/alquimia-chales': typeof AlquimiaChalesRoute
   '/auth': typeof AuthRoute
+  '/vale-do-sol': typeof ValeDoSolRoute
   '/_authenticated/metricas': typeof AuthenticatedMetricasRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth' | '/metricas'
+  fullPaths: '/' | '/alquimia-chales' | '/auth' | '/vale-do-sol' | '/metricas'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/metricas'
+  to: '/' | '/alquimia-chales' | '/auth' | '/vale-do-sol' | '/metricas'
   id:
-    '__root__' | '/' | '/_authenticated' | '/auth' | '/_authenticated/metricas'
+    | '__root__'
+    | '/'
+    | '/_authenticated'
+    | '/alquimia-chales'
+    | '/auth'
+    | '/vale-do-sol'
+    | '/_authenticated/metricas'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AlquimiaChalesRoute: typeof AlquimiaChalesRoute
   AuthRoute: typeof AuthRoute
+  ValeDoSolRoute: typeof ValeDoSolRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -82,11 +108,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/alquimia-chales': {
+      id: '/alquimia-chales'
+      path: '/alquimia-chales'
+      fullPath: '/alquimia-chales'
+      preLoaderRoute: typeof AlquimiaChalesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/auth': {
       id: '/auth'
       path: '/auth'
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/vale-do-sol': {
+      id: '/vale-do-sol'
+      path: '/vale-do-sol'
+      fullPath: '/vale-do-sol'
+      preLoaderRoute: typeof ValeDoSolRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/metricas': {
@@ -113,7 +153,9 @@ const AuthenticatedRouteRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AlquimiaChalesRoute: AlquimiaChalesRoute,
   AuthRoute: AuthRoute,
+  ValeDoSolRoute: ValeDoSolRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
