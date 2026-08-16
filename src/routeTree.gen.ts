@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as ValeDoSolRouteImport } from './routes/vale-do-sol'
 import { Route as AuthenticatedMetricasRouteImport } from './routes/_authenticated/metricas'
 
 const IndexRoute = IndexRouteImport.update({
@@ -28,6 +29,11 @@ const AuthRoute = AuthRouteImport.update({
   path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ValeDoSolRoute = ValeDoSolRouteImport.update({
+  id: '/vale-do-sol',
+  path: '/vale-do-sol',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedMetricasRoute = AuthenticatedMetricasRouteImport.update({
   id: '/metricas',
   path: '/metricas',
@@ -37,11 +43,13 @@ const AuthenticatedMetricasRoute = AuthenticatedMetricasRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/vale-do-sol': typeof ValeDoSolRoute
   '/metricas': typeof AuthenticatedMetricasRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/vale-do-sol': typeof ValeDoSolRoute
   '/metricas': typeof AuthenticatedMetricasRoute
 }
 export interface FileRoutesById {
@@ -49,21 +57,28 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
+  '/vale-do-sol': typeof ValeDoSolRoute
   '/_authenticated/metricas': typeof AuthenticatedMetricasRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth' | '/metricas'
+  fullPaths: '/' | '/auth' | '/vale-do-sol' | '/metricas'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/metricas'
+  to: '/' | '/auth' | '/vale-do-sol' | '/metricas'
   id:
-    '__root__' | '/' | '/_authenticated' | '/auth' | '/_authenticated/metricas'
+    | '__root__'
+    | '/'
+    | '/_authenticated'
+    | '/auth'
+    | '/vale-do-sol'
+    | '/_authenticated/metricas'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
+  ValeDoSolRoute: typeof ValeDoSolRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -87,6 +102,13 @@ declare module '@tanstack/react-router' {
       path: '/auth'
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/vale-do-sol': {
+      id: '/vale-do-sol'
+      path: '/vale-do-sol'
+      fullPath: '/vale-do-sol'
+      preLoaderRoute: typeof ValeDoSolRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/metricas': {
@@ -114,6 +136,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
+  ValeDoSolRoute: ValeDoSolRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
