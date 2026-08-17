@@ -65,15 +65,18 @@ export function PousadaLogin({ onEntrar, pousadaFixa }: Props) {
             <span className="text-xs font-medium text-muted-foreground">Usuário</span>
             <div className="flex items-center gap-2 rounded-lg border border-input bg-background px-3 focus-within:border-ring focus-within:ring-2 focus-within:ring-ring/30">
               <User className="size-4 text-muted-foreground" aria-hidden="true" />
-              <input
-                type="text"
+              <select
                 required
-                autoComplete="username"
                 value={usuario}
                 onChange={(e) => setUsuario(e.target.value)}
                 className="w-full bg-transparent py-2 text-sm text-foreground outline-none"
-                placeholder="Vale do Sol ou seu e-mail"
-              />
+              >
+                <option value="" disabled>Escolha sua pousada</option>
+                <option value="Vale do Sol">Vale do Sol</option>
+                <option value="Alquimia Chalés">Alquimia Chalés</option>
+                <option value="Itaoka Belvedere">Itaoka Belvedere</option>
+                <option value="Ser.Tão">Ser.Tão</option>
+              </select>
             </div>
           </label>
 
