@@ -13,6 +13,8 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AlquimiaChalesRouteImport } from './routes/alquimia-chales'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as ItaokaBelvedereRouteImport } from './routes/itaoka-belvedere'
+import { Route as SerTaoRouteImport } from './routes/ser-tao'
 import { Route as ValeDoSolRouteImport } from './routes/vale-do-sol'
 import { Route as AuthenticatedMetricasRouteImport } from './routes/_authenticated/metricas'
 
@@ -35,6 +37,16 @@ const AuthRoute = AuthRouteImport.update({
   path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ItaokaBelvedereRoute = ItaokaBelvedereRouteImport.update({
+  id: '/itaoka-belvedere',
+  path: '/itaoka-belvedere',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SerTaoRoute = SerTaoRouteImport.update({
+  id: '/ser-tao',
+  path: '/ser-tao',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ValeDoSolRoute = ValeDoSolRouteImport.update({
   id: '/vale-do-sol',
   path: '/vale-do-sol',
@@ -50,6 +62,8 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/alquimia-chales': typeof AlquimiaChalesRoute
   '/auth': typeof AuthRoute
+  '/itaoka-belvedere': typeof ItaokaBelvedereRoute
+  '/ser-tao': typeof SerTaoRoute
   '/vale-do-sol': typeof ValeDoSolRoute
   '/metricas': typeof AuthenticatedMetricasRoute
 }
@@ -57,6 +71,8 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/alquimia-chales': typeof AlquimiaChalesRoute
   '/auth': typeof AuthRoute
+  '/itaoka-belvedere': typeof ItaokaBelvedereRoute
+  '/ser-tao': typeof SerTaoRoute
   '/vale-do-sol': typeof ValeDoSolRoute
   '/metricas': typeof AuthenticatedMetricasRoute
 }
@@ -66,20 +82,38 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/alquimia-chales': typeof AlquimiaChalesRoute
   '/auth': typeof AuthRoute
+  '/itaoka-belvedere': typeof ItaokaBelvedereRoute
+  '/ser-tao': typeof SerTaoRoute
   '/vale-do-sol': typeof ValeDoSolRoute
   '/_authenticated/metricas': typeof AuthenticatedMetricasRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/alquimia-chales' | '/auth' | '/vale-do-sol' | '/metricas'
+  fullPaths:
+    | '/'
+    | '/alquimia-chales'
+    | '/auth'
+    | '/itaoka-belvedere'
+    | '/ser-tao'
+    | '/vale-do-sol'
+    | '/metricas'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/alquimia-chales' | '/auth' | '/vale-do-sol' | '/metricas'
+  to:
+    | '/'
+    | '/alquimia-chales'
+    | '/auth'
+    | '/itaoka-belvedere'
+    | '/ser-tao'
+    | '/vale-do-sol'
+    | '/metricas'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/alquimia-chales'
     | '/auth'
+    | '/itaoka-belvedere'
+    | '/ser-tao'
     | '/vale-do-sol'
     | '/_authenticated/metricas'
   fileRoutesById: FileRoutesById
@@ -89,6 +123,8 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AlquimiaChalesRoute: typeof AlquimiaChalesRoute
   AuthRoute: typeof AuthRoute
+  ItaokaBelvedereRoute: typeof ItaokaBelvedereRoute
+  SerTaoRoute: typeof SerTaoRoute
   ValeDoSolRoute: typeof ValeDoSolRoute
 }
 
@@ -120,6 +156,20 @@ declare module '@tanstack/react-router' {
       path: '/auth'
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/itaoka-belvedere': {
+      id: '/itaoka-belvedere'
+      path: '/itaoka-belvedere'
+      fullPath: '/itaoka-belvedere'
+      preLoaderRoute: typeof ItaokaBelvedereRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ser-tao': {
+      id: '/ser-tao'
+      path: '/ser-tao'
+      fullPath: '/ser-tao'
+      preLoaderRoute: typeof SerTaoRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/vale-do-sol': {
@@ -155,6 +205,8 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AlquimiaChalesRoute: AlquimiaChalesRoute,
   AuthRoute: AuthRoute,
+  ItaokaBelvedereRoute: ItaokaBelvedereRoute,
+  SerTaoRoute: SerTaoRoute,
   ValeDoSolRoute: ValeDoSolRoute,
 }
 export const routeTree = rootRouteImport
