@@ -28,6 +28,28 @@ const ALQUIMIA_UNIDADES: UnidadeBase[] = [
   "Esmeralda",
 ].map((nome) => ({ nome }));
 
+const SERTAO_UNIDADES: UnidadeBase[] = [
+  "01",
+  "02",
+  "03",
+  "05",
+  "06",
+  "07",
+  "08",
+  "09",
+  "10",
+  "11",
+  "12",
+].map((n) => ({ nome: `Quarto ${n}` }));
+
+const ITAOKA_UNIDADES: UnidadeBase[] = [
+  "Realize",
+  "Acredite",
+  "Sonhe",
+  "Inspire",
+  "Gratidão",
+].map((nome) => ({ nome: `Chalé ${nome}` }));
+
 export const POUSADAS: Pousada[] = [
   {
     slug: "vale-do-sol",
@@ -44,6 +66,22 @@ export const POUSADAS: Pousada[] = [
     senha: "8235",
     subtitulo: "Monte os pedidos dos chalés e envie no grupo do WhatsApp",
     unidades: ALQUIMIA_UNIDADES,
+  },
+  {
+    slug: "ser-tao",
+    nome: "Pousada Ser.Tão",
+    usuario: "Ser.Tão",
+    senha: "1882",
+    subtitulo: "Monte os pedidos dos quartos e envie no grupo do WhatsApp",
+    unidades: SERTAO_UNIDADES,
+  },
+  {
+    slug: "itaoka-belvedere",
+    nome: "Pousada Itaoka Belvedere",
+    usuario: "Itaoka Belvedere",
+    senha: "1313",
+    subtitulo: "Monte os pedidos dos chalés e envie no grupo do WhatsApp",
+    unidades: ITAOKA_UNIDADES,
   },
 ];
 
