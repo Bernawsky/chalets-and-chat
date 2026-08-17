@@ -67,6 +67,22 @@ export const POUSADAS: Pousada[] = [
     subtitulo: "Monte os pedidos dos chalés e envie no grupo do WhatsApp",
     unidades: ALQUIMIA_UNIDADES,
   },
+  {
+    slug: "ser-tao",
+    nome: "Pousada Ser.Tão",
+    usuario: "Ser.Tão",
+    senha: "1882",
+    subtitulo: "Monte os pedidos dos quartos e envie no grupo do WhatsApp",
+    unidades: SERTAO_UNIDADES,
+  },
+  {
+    slug: "itaoka-belvedere",
+    nome: "Pousada Itaoka Belvedere",
+    usuario: "Itaoka Belvedere",
+    senha: "1313",
+    subtitulo: "Monte os pedidos dos chalés e envie no grupo do WhatsApp",
+    unidades: ITAOKA_UNIDADES,
+  },
 ];
 
 export function pousadaPorSlug(slug: string | null | undefined): Pousada | null {
