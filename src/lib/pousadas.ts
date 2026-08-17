@@ -32,6 +32,7 @@ const SERTAO_UNIDADES: UnidadeBase[] = [
   "01",
   "02",
   "03",
+  "04",
   "05",
   "06",
   "07",
