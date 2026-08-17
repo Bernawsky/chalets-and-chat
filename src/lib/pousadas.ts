@@ -28,6 +28,28 @@ const ALQUIMIA_UNIDADES: UnidadeBase[] = [
   "Esmeralda",
 ].map((nome) => ({ nome }));
 
+const SERTAO_UNIDADES: UnidadeBase[] = [
+  "01",
+  "02",
+  "03",
+  "05",
+  "06",
+  "07",
+  "08",
+  "09",
+  "10",
+  "11",
+  "12",
+].map((n) => ({ nome: `Quarto ${n}` }));
+
+const ITAOKA_UNIDADES: UnidadeBase[] = [
+  "Realize",
+  "Acredite",
+  "Sonhe",
+  "Inspire",
+  "Gratidão",
+].map((nome) => ({ nome: `Chalé ${nome}` }));
+
 export const POUSADAS: Pousada[] = [
   {
     slug: "vale-do-sol",
