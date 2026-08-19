@@ -1,10 +1,20 @@
 import { useState } from "react";
-import { LogIn, Lock, User } from "lucide-react";
+import { LogIn, Lock, ShieldCheck, Building2 } from "lucide-react";
 import { toast } from "sonner";
 import { useNavigate } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectSeparator,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
-import { autenticarPousada, type Pousada } from "@/lib/pousadas";
+import { autenticarPousada, POUSADAS, type Pousada } from "@/lib/pousadas";
 
 type Props = {
   onEntrar: (pousada: Pousada) => void;
@@ -12,35 +22,56 @@ type Props = {
   pousadaFixa?: Pousada;
 };
 
+/** Contas administrativas (Developer / Enterprise) que acessam o dashboard. */
+const ADMINS = [
+  {
+    valor: "admin:bernardo",
+    nome: "Bernardo Campos",
+    papel: "Developer",
+    email: "bernardootavio007@gmail.com",
+  },
+  {
+    valor: "admin:beth",
+    nome: "Quitutes da Beth",
+    papel: "Enterprise",
+    email: "quitutesdabethibitipoca@gmail.com",
+  },
+] as const;
+
 export function PousadaLogin({ onEntrar, pousadaFixa }: Props) {
   const navigate = useNavigate();
-  const [usuario, setUsuario] = useState(pousadaFixa?.usuario ?? "");
+  const [selecionado, setSelecionado] = useState(pousadaFixa?.slug ?? "");
   const [senha, setSenha] = useState("");
   const [enviando, setEnviando] = useState(false);
+
+  const admin = ADMINS.find((a) => a.valor === selecionado);
 
   const submeter = async (e: React.FormEvent) => {
     e.preventDefault();
     if (enviando) return;
-    const p = autenticarPousada(usuario, senha);
+
+    if (admin) {
+      setEnviando(true);
+      const { error } = await supabase.auth.signInWithPassword({
+        email: admin.email,
+        password: senha,
+      });
+      setEnviando(false);
+      if (error) {
+        toast.error("Senha inválida para a conta administrativa");
+        return;
+      }
+      toast.success(`Bem-vindo, ${admin.nome}!`);
+      void navigate({ to: "/metricas" });
+      return;
+    }
+
+    const alvo = POUSADAS.find((p) => p.slug === selecionado);
+    const p = alvo ? autenticarPousada(alvo.usuario, senha) : null;
     if (p && (!pousadaFixa || p.slug === pousadaFixa.slug)) {
       toast.success(`Bem-vindo, ${p.nome}!`);
       onEntrar(p);
       return;
-    }
-
-    // Enterprise/Developer entram pelo mesmo formulário, usando e-mail e senha.
-    if (usuario.includes("@")) {
-      setEnviando(true);
-      const { error } = await supabase.auth.signInWithPassword({
-        email: usuario.trim(),
-        password: senha,
-      });
-      setEnviando(false);
-      if (!error) {
-        toast.success("Bem-vindo de volta!");
-        void navigate({ to: "/metricas" });
-        return;
-      }
     }
 
     toast.error("Usuário ou senha inválidos");
@@ -56,28 +87,50 @@ export function PousadaLogin({ onEntrar, pousadaFixa }: Props) {
           {pousadaFixa ? pousadaFixa.nome : "Sistema de Pedidos"}
         </h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Entre com o usuário e a senha da pousada para montar os pedidos. Contas
-          enterprise e developer podem entrar aqui com e-mail e senha.
+          Escolha sua pousada e informe a senha para montar os pedidos. Contas de
+          administração acessam o dashboard de métricas.
         </p>
 
         <form className="mt-6 flex flex-col gap-4" onSubmit={submeter}>
           <label className="flex flex-col gap-1.5">
             <span className="text-xs font-medium text-muted-foreground">Usuário</span>
-            <div className="flex items-center gap-2 rounded-lg border border-input bg-background px-3 focus-within:border-ring focus-within:ring-2 focus-within:ring-ring/30">
-              <User className="size-4 text-muted-foreground" aria-hidden="true" />
-              <select
-                required
-                value={usuario}
-                onChange={(e) => setUsuario(e.target.value)}
-                className="w-full bg-transparent py-2 text-sm text-foreground outline-none"
-              >
-                <option value="" disabled>Escolha sua pousada</option>
-                <option value="Vale do Sol">Vale do Sol</option>
-                <option value="Alquimia Chalés">Alquimia Chalés</option>
-                <option value="Itaoka Belvedere">Itaoka Belvedere</option>
-                <option value="Ser.Tão">Ser.Tão</option>
-              </select>
-            </div>
+            <Select
+              value={selecionado}
+              onValueChange={setSelecionado}
+              disabled={Boolean(pousadaFixa)}
+            >
+              <SelectTrigger className="h-11 w-full rounded-lg border-input bg-background text-sm">
+                <SelectValue placeholder="Escolha sua pousada" />
+              </SelectTrigger>
+              <SelectContent className="rounded-xl border-border">
+                <SelectGroup>
+                  <SelectLabel className="text-[11px] font-semibold tracking-wide text-muted-foreground uppercase">
+                    Pousadas
+                  </SelectLabel>
+                  {POUSADAS.map((p) => (
+                    <SelectItem key={p.slug} value={p.slug} className="rounded-lg py-2.5">
+                      <Building2 className="size-4 text-muted-foreground" aria-hidden="true" />
+                      <span className="font-medium">{p.usuario}</span>
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
+                <SelectSeparator />
+                <SelectGroup>
+                  <SelectLabel className="text-[11px] font-semibold tracking-wide text-muted-foreground uppercase">
+                    Administration
+                  </SelectLabel>
+                  {ADMINS.map((a) => (
+                    <SelectItem key={a.valor} value={a.valor} className="rounded-lg py-2.5">
+                      <ShieldCheck className="size-4 text-accent-foreground" aria-hidden="true" />
+                      <span className="font-medium">{a.nome}</span>
+                      <span className="ml-1 rounded-md bg-secondary px-1.5 py-0.5 text-[10px] font-semibold text-secondary-foreground">
+                        {a.papel}
+                      </span>
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
+              </SelectContent>
+            </Select>
           </label>
 
           <label className="flex flex-col gap-1.5">
@@ -90,13 +143,13 @@ export function PousadaLogin({ onEntrar, pousadaFixa }: Props) {
                 autoComplete="current-password"
                 value={senha}
                 onChange={(e) => setSenha(e.target.value)}
-                className="w-full bg-transparent py-2 text-sm text-foreground outline-none"
+                className="w-full bg-transparent py-2.5 text-sm text-foreground outline-none"
                 placeholder="••••"
               />
             </div>
           </label>
 
-          <Button type="submit" disabled={enviando} className="gap-2">
+          <Button type="submit" disabled={enviando || !selecionado} className="gap-2">
             <LogIn className="size-4" aria-hidden="true" />
             {enviando ? "Entrando..." : "Entrar"}
           </Button>
